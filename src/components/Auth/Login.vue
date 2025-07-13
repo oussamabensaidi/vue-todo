@@ -87,6 +87,7 @@ const handleLogin = async () => {
   })
 
   if (result.success) {
+    // localStorage.setItem('token', response.data.token)
     router.push('/tasks') // ✅ Make sure the route exists and is named correctly
   } else {
     console.error('Login failed:', result.error)

@@ -5,6 +5,8 @@
       <h1 class="page-title">Gestion des Tâches</h1>
       <TaskForm />
       <TaskList />
+          <!-- <LogoutButton v-if="authStore.isAuthenticated" /> -->
+
     </div>
   </div>
 </template>
@@ -12,6 +14,8 @@
 <script setup>
 import TaskForm from '@/components/Tasks/TaskForm.vue'
 import TaskList from '@/components/Tasks/TaskList.vue'
+import LogoutButton from '@/components/Tasks/LogoutButton.vue'
+
 </script>
 
 <style scoped>

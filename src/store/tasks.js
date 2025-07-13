@@ -1,35 +1,5 @@
-// import { defineStore } from 'pinia';
-// import axios from 'axios';
-
-// export const useTaskStore = defineStore('tasks', {
-//   state: () => ({
-//     tasks: [],
-//   }),
-
-//   actions: {
-//     async fetchTasks() {
-//       const res = await axios.get('/api/tasks', {
-//         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-//       });
-//       this.tasks = res.data;
-//     },
-
-//     async addTask(task) {
-//       await axios.post('/api/tasks', task, {
-//         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-//       });
-//     },
-
-//     async deleteTask(id) {
-//       await axios.delete(`/api/tasks/${id}`, {
-//         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-//       });
-//     }
-//   }
-// });
-
-// src/store/tasks.js
 import { defineStore } from 'pinia'
+import { useAuthStore } from '@/store/auth'  // Fixed import path
 import api from '@/services/api'
 
 export const useTaskStore = defineStore('tasks', {
@@ -48,37 +18,114 @@ export const useTaskStore = defineStore('tasks', {
 
   actions: {
     async fetchTasks() {
-      this.loading = true
-      this.error = null
+      this.loading = true;
+      this.error = null;
       
       try {
-        const response = await api.get('/tasks')
-        this.tasks = response.data.data || response.data // Handle different response formats
-        return { success: true, data: this.tasks }
+        // Get auth store instance
+        const authStore = useAuthStore();
+        
+        // Check authentication using the store's getter
+        if (!authStore.isAuthenticated) {
+          throw new Error('User is not authenticated');
+        }
+
+        const response = await api.get('/tasks');
+        
+        // Handle different response structures
+        this.tasks = response.data?.data || response.data || [];
+        
+        return { 
+          success: true, 
+          data: this.tasks 
+        };
       } catch (error) {
-        this.error = error.response?.data?.message || 'Failed to fetch tasks'
-        console.error('Error fetching tasks:', error)
-        return { success: false, error: this.error }
+        this.error = this.normalizeError(error);
+        
+        console.error('Task fetch error:', {
+          status: error.response?.status,
+          message: error.message,
+          endpoint: error.config?.url,
+          timestamp: new Date().toISOString()
+        });
+
+        // Handle unauthorized errors
+        if (error.response?.status === 401) {
+          const authStore = useAuthStore();
+          authStore.logout(); // Use the auth store's logout method
+        }
+        
+        return { 
+          success: false, 
+          error: this.error,
+          status: error.response?.status 
+        };
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
+    normalizeError(error) {
+      // Unified error message handling
+      if (error.response) {
+        return error.response.data?.message || 
+               error.response.data?.error ||
+               `Request failed with status ${error.response.status}`;
+      }
+      return error.message || 'Network error occurred';
+    },
+
     async createTask(taskData) {
-      this.loading = true
-      this.error = null
+      this.loading = true;
+      this.error = null;
       
       try {
-        const response = await api.post('/tasks', taskData)
-        const newTask = response.data.data || response.data
-        this.tasks.push(newTask)
-        return { success: true, data: newTask }
+        // Debug: Log the task data being sent
+        console.log('Sending task data:', JSON.stringify(taskData, null, 2));
+        
+        // Debug: Verify authentication token exists
+        const token = localStorage.getItem('auth_token');  // Fixed token key
+        console.log('Current auth token:', token ? 'Exists' : 'Missing');
+        
+        const response = await api.post('/tasks', taskData);
+        
+        // Debug: Log full response
+        console.log('Create task response:', response);
+        
+        const newTask = response.data.data || response.data;
+        this.tasks.push(newTask);
+        return { success: true, data: newTask };
+        
       } catch (error) {
-        this.error = error.response?.data?.message || 'Failed to create task'
-        console.error('Error creating task:', error)
-        return { success: false, error: this.error }
+        // Enhanced error handling
+        const errorDetails = {
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          message: error.response?.data?.message,
+          validationErrors: error.response?.data?.errors,
+          serverError: error.response?.data?.error,
+          requestConfig: {
+            url: error.config?.url,
+            method: error.config?.method,
+            data: error.config?.data
+          }
+        };
+        
+        console.error('Detailed task creation error:', errorDetails);
+        
+        // Set user-friendly error message
+        this.error = error.response?.data?.message || 
+                    error.response?.data?.error || 
+                    (error.response?.status === 500 ? 'Server error occurred' : 'Failed to create task');
+        
+        return { 
+          success: false, 
+          error: this.error,
+          details: errorDetails // Return details for debugging
+        };
+        
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 

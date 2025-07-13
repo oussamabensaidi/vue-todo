@@ -8,6 +8,7 @@
           <router-link to="/" class="nav-link">Accueil</router-link>
           <router-link to="/tasks" class="nav-link">Tâches</router-link>
           <router-link to="/notifications" class="nav-link">Notifications</router-link>
+                
         </div>
       </div>
     </nav>
