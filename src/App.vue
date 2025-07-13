@@ -4,25 +4,51 @@
     <nav class="navbar">
       <div class="nav-container">
         <router-link to="/" class="nav-logo">Todo App</router-link>
+
         <div class="nav-links">
-          <router-link to="/" class="nav-link">Accueil</router-link>
-          <router-link to="/tasks" class="nav-link">Tâches</router-link>
-          <router-link to="/notifications" class="nav-link">Notifications</router-link>
-                
+          <template v-if="isAuthenticated">
+            <router-link to="/" class="nav-link">Accueil</router-link>
+            <router-link to="/tasks" class="nav-link">Tâches</router-link>
+            <router-link to="/notifications" class="nav-link">Notifications</router-link>
+            <button @click="handleLogout" class="nav-link logout-button">Déconnexion</button>
+          </template>
+
+          <template v-else>
+            <router-link to="/login" class="nav-link">Connexion</router-link>
+            <router-link to="/register" class="nav-link">Inscription</router-link>
+          </template>
         </div>
       </div>
     </nav>
-    
+
     <main class="main-content">
       <router-view />
     </main>
   </div>
 </template>
 
-<script>
-export default {
-  name: 'App'
+
+
+<script setup>
+import { useAuthStore } from '@/store/auth'
+import { useRouter } from 'vue-router'
+import { computed, onMounted } from 'vue'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+// Make sure auth is initialized
+onMounted(() => {
+  authStore.initializeAuth()
+})
+
+const isAuthenticated = computed(() => authStore.isAuthenticated)
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
 }
+// export default 'app';
 </script>
 
 <style>
@@ -108,4 +134,19 @@ body {
     padding: 1rem 0;
   }
 }
+.logout-button {
+  background: none;
+  border: none;
+  color: white;
+  font: inherit;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
 </style>

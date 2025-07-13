@@ -4,7 +4,11 @@
     <div class="container">
       <h1 class="page-title">Gestion des Tâches</h1>
       <TaskForm />
-      <TaskList />
+      <TaskList 
+        @delete="deleteTask"
+        @toggle="toggleTask"
+
+      />
           <!-- <LogoutButton v-if="authStore.isAuthenticated" /> -->
 
     </div>

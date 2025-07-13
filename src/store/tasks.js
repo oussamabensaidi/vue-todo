@@ -193,6 +193,42 @@ export const useTaskStore = defineStore('tasks', {
       } finally {
         this.loading = false
       }
+    },
+    
+   async toggleTaskStatus(id) {
+  this.loading = true
+  this.error = null
+  
+  // Find task in the local state
+  const task = this.tasks.find(t => t.id === id)
+  if (!task) {
+    this.loading = false
+    return { success: false, error: 'Task not found' }
+  }
+
+  try {
+    // Send PUT request toggling 'terminer' boolean
+    const response = await api.put(`/tasks/${id}`, {
+      ...task,
+      terminer: !task.terminer
+    })
+    
+    const updatedTask = response.data.data || response.data
+    
+    // Update local task with updated data
+    const index = this.tasks.findIndex(t => t.id === id)
+    if (index !== -1) {
+      this.tasks[index] = updatedTask
     }
+    
+    return { success: true, data: updatedTask }
+  } catch (error) {
+    this.error = error.response?.data?.message || 'Failed to toggle task status'
+    console.error('Toggle task status error:', error)
+    return { success: false, error: this.error }
+  } finally {
+    this.loading = false
+  }
+},
   }
 })
