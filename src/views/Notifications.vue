@@ -3,13 +3,14 @@
   <div class="notifications-view">
     <div class="container">
       <h1 class="page-title">Notifications</h1>
+
       <div class="notifications-container">
         <div class="notification-card">
           <h2>Bienvenue!</h2>
           <p>Vous avez accédé à la page des notifications.</p>
           <p>Ici, vous pourrez voir vos notifications de tâches à venir.</p>
         </div>
-        
+
         <div class="notification-card">
           <h3>Fonctionnalités à venir</h3>
           <ul>
@@ -19,13 +20,49 @@
             <li>Résumés quotidiens</li>
           </ul>
         </div>
+
+        <!-- ✅ Notification de tâche créée -->
+        <div v-if="taskCreated" class="notification-card">
+          <h3>Nouvelle tâche créée</h3>
+          <p>Une nouvelle tâche a été ajoutée avec succès.</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-// Vous pouvez ajouter la logique des notifications ici
+// import { ref, onMounted } from 'vue'
+
+// // 🔔 Variable de notification (activée lors de la création d'une tâche)
+// const taskCreated = ref(false)
+
+// // 🔁 Simule une tâche créée via événement ou sessionStorage
+// onMounted(() => {
+//   // Exemple : récupérer un indicateur de succès depuis sessionStorage
+//   if (sessionStorage.getItem('taskCreated') === 'true') {
+//     taskCreated.value = true
+//     sessionStorage.removeItem('taskCreated') // Reset après affichage
+//   }
+// })
+import { ref, onMounted } from 'vue'
+
+onMounted(() => {
+  if (sessionStorage.getItem('taskCreated') === 'true') {
+    taskCreated.value = true
+    sessionStorage.removeItem('taskCreated')
+  }
+
+  const userId = JSON.parse(localStorage.getItem('user'))?.id
+  if (!userId) return
+
+  window.Echo.private(`tasks.${userId}`)
+    .listen('TaskCreated', (e) => {
+      console.log('✅ Task created event received:', e)
+      taskCreated.value = true
+    })
+})
+
 </script>
 
 <style scoped>
@@ -87,7 +124,7 @@
   .page-title {
     font-size: 2rem;
   }
-  
+
   .notification-card {
     padding: 1.5rem;
   }

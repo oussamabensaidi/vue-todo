@@ -162,12 +162,16 @@ const submitTask = () => {
         {{ taskStore.isLoading ? 'Ajout en cours...' : 'Ajouter la tâche' }}
       </button>
     </form>
+    <div v-if="taskCreated" class="alert alert-success">
+      ✅ Tâche créée avec succès via Pusher!
+    </div>
   </div>
 </template>
 
 <script setup>
 import { reactive } from 'vue'
 import { useTaskStore } from '@/store/tasks'
+import { ref, onMounted } from 'vue'
 
 const taskStore = useTaskStore()
 
@@ -190,9 +194,32 @@ const submitTask = async () => {
     }
   }
 }
+
+
+const taskCreated = ref(false)
+
+onMounted(() => {
+  const userId = JSON.parse(localStorage.getItem('user'))?.id
+  if (!userId) return
+
+  window.Echo.private(`tasks.${userId}`)
+    .listen('TaskCreated', (e) => {
+      console.log('📥 Event reçu dans la page de création:', e)
+      alert('test')
+      taskCreated.value = true
+    })
+})
 </script>
 
 <style scoped>
+.alert {
+  padding: 1rem;
+  margin-top: 1rem;
+  background-color: #d1fae5;
+  border-left: 4px solid #10b981;
+  color: #065f46;
+  border-radius: 0.5rem;
+}
 .task-form-wrapper {
   max-width: 600px;
   margin: 2rem auto;
