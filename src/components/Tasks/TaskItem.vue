@@ -1,12 +1,12 @@
 <template>
   <li class="task-item">
     <div class="task-left">
-      <input
-        type="checkbox"
-        v-model="checked"
-        @change="$emit('toggle', task.id)"
-        class="task-checkbox"
-      />
+<input
+  type="checkbox"
+  v-model="checked"
+  @change="emitToggle"
+  class="task-checkbox"
+/>
 
       <div class="task-content">
         <h3 :class="{ 'task-title': true, terminer: checked }">{{ task.titre }}</h3>
@@ -31,12 +31,22 @@ const props = defineProps({
   }
 })
 
-const checked = ref(props.task.terminer || false)
+const emit = defineEmits(['toggle', 'delete'])
 
-// Optional: keep local state synced with parent updates
+const checked = ref(Boolean(props.task.terminer))
+
+
+// Sync with prop if it changes
 watch(() => props.task.terminer, (val) => {
   checked.value = val
 })
+
+const emitToggle = () => {
+  emit('toggle', props.task.id, { terminer: checked.value })
+}
+
+
+
 </script>
 
 <style scoped>

@@ -72,11 +72,11 @@ export default {
     
     <ul v-else class="task-list">
       <TaskItem
-        v-for="task in taskStore.getTasks"
-        :key="task.id"
-        :task="task"
-        @delete="deleteTask"
-        @update="updateTask"
+  v-for="task in taskStore.getTasks"
+  :key="task.id"
+  :task="task"
+  @toggle="toggleTaskStatus"
+  @delete="deleteTask"
       />
     </ul>
   </div>
@@ -101,6 +101,9 @@ const deleteTask = async (taskId) => {
 
 const updateTask = async (taskId, taskData) => {
   await taskStore.updateTask(taskId, taskData)
+}
+const toggleTaskStatus = async (taskId, updateData) => {
+  await taskStore.updateTask(taskId, updateData)
 }
 </script>
 

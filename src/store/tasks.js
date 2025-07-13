@@ -129,28 +129,19 @@ export const useTaskStore = defineStore('tasks', {
       }
     },
 
-    async updateTask(id, taskData) {
-      this.loading = true
-      this.error = null
-      
-      try {
-        const response = await api.put(`/tasks/${id}`, taskData)
-        const updatedTask = response.data.data || response.data
-        
-        const index = this.tasks.findIndex(task => task.id === id)
-        if (index !== -1) {
-          this.tasks[index] = updatedTask
-        }
-        
-        return { success: true, data: updatedTask }
-      } catch (error) {
-        this.error = error.response?.data?.message || 'Failed to update task'
-        console.error('Error updating task:', error)
-        return { success: false, error: this.error }
-      } finally {
-        this.loading = false
-      }
-    },
+async updateTask(id, updatedData) {
+  try {
+    const response = await api.put(`/tasks/${id}`, updatedData)
+    const updatedTask = response.data.data || response.data
+
+    const index = this.tasks.findIndex(t => t.id === id)
+    if (index !== -1) {
+      this.tasks[index] = updatedTask
+    }
+  } catch (error) {
+    console.error('Erreur update:', error)
+  }
+},
 
     async deleteTask(id) {
       this.loading = true
@@ -230,5 +221,6 @@ export const useTaskStore = defineStore('tasks', {
     this.loading = false
   }
 },
+
   }
 })
