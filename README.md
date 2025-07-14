@@ -1,16 +1,5 @@
 # vue-todo
-
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
+# Project Setup
 
 ```sh
 npm install
@@ -27,3 +16,21 @@ npm run dev
 ```sh
 npm run build
 ```
+# 📋 Front-End – To-Do List Application (Vue.js + Pinia + Pusher)
+
+This is the **Front-End** part of the full-stack **To-Do List** application, built using **Vue.js**, **Pinia**, **Axios**, and **Laravel Echo** with **Pusher** for real-time notifications.  
+It interacts with a Laravel API secured by **JWT** authentication.
+
+---
+
+## 🚀 Tech Stack
+
+- ✅ Vue 3 (Composition API)
+- ✅ Pinia (State Management)
+- ✅ Vue Router
+- ✅ Axios (HTTP Requests)
+- ✅ Laravel Echo + Pusher-js (Real-Time Events)
+- ✅ Bootstrap (UI styling)
+- ✅ Vite (Dev Server & Build)
+
+---
